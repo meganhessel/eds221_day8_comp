@@ -1,0 +1,132 @@
+---
+title: "Ggplot_practice"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+## Ggplot_practice
+```{r}
+#attaching packages
+
+#| warning: false
+#| message: false
+# General use packages:
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+
+##ggplot basics 
+```{r}
+# data
+lizards <- read_csv(here("data_tidy", "lizards.csv"))
+```
+# the essentials 
+- data 
+- aethesitics 
+- geometery 
+
+```{r}
+# the essentials 3 ways 
+# first: data and aesthetics stay consistent throughout plot  
+ggplot(data = lizards, 
+       aes(x = total_length, 
+           y = weight)) + 
+  geom_point()
+
+#second: data stays consistent through plot 
+ggplot(data = lizards) + 
+  geom_point(aes(x = total_length, 
+                 y = weight))
+
+# thrid: nothing stays consistent 
+ggplot() + 
+  geom_point(data = lizards, 
+             aes(x = total_length, 
+                 y = weight))
+```
+
+# Swap out geometrics 
+```{r}
+ggplot(data = lizards, 
+       aes(x = total_length, 
+           y = weight)) + 
+  geom_line()
+```
+
+some geomertry only needs one axis 
+```{r}
+ggplot(data = lizards, 
+       aes(x = total_length)) + 
+  geom_histogram()
+```
+
+jitterplots usually are best with one categorical and one continous variable 
+```{r}
+ggplot(data = lizards, 
+       aes(x = weight, 
+           y = common_name)) + 
+  geom_jitter()
+```
+
+## Aesthetic mapping 
+
+###updating based on a constant value 
+Don't need to use the `aes()` function 
+
+```{r}
+ggplot(data = lizards, 
+       aes(x = weight)) + 
+  geom_histogram(color = "#F93943", 
+                 fill = "purple", 
+                 alpha = 0.5, 
+                 linetype = "dotted")
+
+
+```
+
+## updating aesthetics based on variables 
+In the case, we need to use the aes() function 
+
+```{r}
+ggplot(data = lizards, 
+       aes(x = total_length, 
+           y = weight)) + 
+  geom_point(aes(color = common_name), 
+             alpha = 0.3)
+```
+
+# Themes 
+
+```{r}
+ggplot(data = lizards, 
+       aes(x = weight, 
+           y = site)) + 
+  geom_jitter(aes(color = common_name), 
+              alpha = 0.5) + 
+  theme_light() + 
+  theme(plot.title = element_text(hjust = 1)) +
+  labs(x = "Weight (g)", 
+       y = "Study Site", 
+       title = "Lizard weights across sites at Jornada", 
+       color = "Species")
+```
+
+## reorder data 
+```{r}
+lizard_counts <- lizards %>% 
+  count(common_name)
+
+ggplot(data = lizard_counts, 
+       aes(x = n, 
+           y = fct_reorder(common_name, n))) + 
+  geom_col() + 
+  labs(x = "Indiviudals (n)", 
+       y = "Species common name")
+
+
+```
+
